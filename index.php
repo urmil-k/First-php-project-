@@ -101,9 +101,9 @@ include_once "includes/dbc.inc.php";
                                              class="card-img-top" 
                                              alt="' . htmlspecialchars($row['pname']) . '" 
                                              style="height:200px;object-fit:contain;">
-                                        <div class="card-body text-center">
-                                            <h5 class="card-title">' . htmlspecialchars($row['pname']) . '</h5>
-                                            <p class="text-muted">₹' . number_format($row['price']) . '</p>
+                                        <div class="card-body text-left">
+                                            <p class="card-title">' . htmlspecialchars($row['pname']) . '</p>
+                                            <h4 class="text-dark">₹' . number_format($row['price']) . '</h4>
                                         </div>
                                     </a>
                                     <div class="card-footer bg-white text-center mt-auto">
@@ -144,7 +144,7 @@ include_once "includes/dbc.inc.php";
         </div>
     </section>
     <?php include_once "includes/footer.php"; ?>
-    <script src="product_cart.js"></script>
+    <script src="product_cart.jsX"></script>
 </body>
 
 </html>

@@ -48,6 +48,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <title>Product List - Admin Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 
 <body class="bg-light">
@@ -80,7 +81,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <a href="product_list.php" class="btn btn-secondary">Reset</a>
             </div>
             <div class="col-auto ms-auto">
-                <a href="add_product.php" class="btn btn-success">➕ Add New Product</a>
+                <a href="add_product.php" class="btn btn-success"><i class="bi bi-plus fs-5"></i> Add New Product</a>
             </div>
         </form>
 
@@ -128,7 +129,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
         </table>
 
-        <a href="dashboard.php" class="btn btn-secondary mt-3 mb-4">🔙 Back to Dashboard</a>
+        <a href="dashboard.php" class="btn btn-secondary mt-3 mb-4"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
     </div>
 
 </body>

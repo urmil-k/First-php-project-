@@ -60,6 +60,7 @@ foreach ($orders as $row) {
     <meta charset="UTF-8">
     <title>My Account</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 
 <body class="bg-light">
@@ -71,7 +72,7 @@ foreach ($orders as $row) {
                 <!-- Account Info -->
                 <div class="card shadow mb-4">
                     <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">👤 My Account</h4>
+                        <h4 class="mb-0"><i class="bi bi-person-fill"></i> My Account</h4>
                     </div>
                     <div class="card-body">
                         <p><strong>Username:</strong> <?= htmlspecialchars($user['uname']) ?></p>
@@ -129,7 +130,7 @@ foreach ($orders as $row) {
                                     if ($status != 'cancelled' && $status != 'delivered'): ?>
                                         <div class="text-end">
                                             <button type="button" class="btn btn-danger mt-2" onclick="cancel_order(<?= $ord['order_id'] ?>)">
-                                                ✖️ Cancel Order
+                                                 Cancel Order
                                             </button>
                                         </div>
                                     <?php else: ?>

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 
 <body>
@@ -20,7 +21,7 @@
                 <div class="col-md-7">
                     <div class="card shadow-lg border-0 rounded-3">
                         <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4">➕ Add Product</h2>
+                            <h2 class="card-title text-center mb-4"><i class="bi bi-bag"></i>  Add Product</h2>
 
                             <form action="handlers/add_product_handler.php" method="post" enctype="multipart/form-data">
 

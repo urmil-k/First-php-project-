@@ -25,6 +25,7 @@ $returnUrl = $_GET['return'] ?? 'index.php';
     <meta charset="UTF-8" />
     <title><?= htmlspecialchars($product['pname']) ?> - Product Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 
 <body class="bg-light">
@@ -47,9 +48,9 @@ $returnUrl = $_GET['return'] ?? 'index.php';
 
             <div class="col-md-7">
                 <h2><?= htmlspecialchars($product['pname']) ?></h2>
-                <p class="fs-4">💵 ₹<?= number_format($product['price'], 2) ?></p>
-                <p>⭐ Rating: <?= htmlspecialchars($product['rating']) ?></p>
-                <p>👍 <?= htmlspecialchars($product['how_many_bought']) ?>+ people bought this</p>
+                <p class="fs-4"><i class="bi bi-currency-rupee text-dark fs-4"></i> <?= number_format($product['price'], 2) ?></p>
+                <p><i class="bi bi-star-fill text-warning"></i> Rating: <?= htmlspecialchars($product['rating']) ?></p>
+                <p><i class="bi bi-person-fill-check"></i> <?= htmlspecialchars($product['how_many_bought']) ?>+ people bought this</p>
                 <p>💳 EMI: <?= htmlspecialchars($product['EMI_avail']) ?></p>
 
 
@@ -63,7 +64,7 @@ $returnUrl = $_GET['return'] ?? 'index.php';
 
     <a href="<?= htmlspecialchars($returnUrl) ?>" 
        class="btn btn-outline-secondary btn-lg flex-fill d-flex justify-content-center align-items-center">
-       🔙 Back
+       🔙 Continue Shopling
     </a>
 </div>
 </div>
