@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':uname', $uname);
         $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC); 
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$result || $uname !== $result['uname']) {
             $errors['username_wrong'] = "Incorrect username.";
@@ -39,13 +39,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $_SESSION['user_id'] = $result['uid'];
         $_SESSION['user_name'] = $result['uname'];
+        $_SESSION['toast_message'] = [
+            'icon' => 'success',
+            'title' => 'Welcome Back!',
+            'text' => 'You are successfully logged in as ' . htmlspecialchars($result['uname']) . '.',
+        ];
         header('Location: ../index.php');
         exit;
-
     } catch (PDOException $e) {
         die("Query failed: " . $e->getMessage());
     }
-
 } else {
     header('Location: ../login.php');
     exit;

@@ -10,16 +10,38 @@ include_once "includes/dbc.inc.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Store - Home</title>
+    <title>E-COMMERCE(APPLE STORE) - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
     <?php include_once "includes/header.php"; ?>
+    <?php if (isset($_SESSION['toast_message'])): ?>
+        <script>
+            // Pass the PHP array directly to JavaScript
+            const toastData = <?= json_encode($_SESSION['toast_message']) ?>;
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: toastData.icon,
+                title: toastData.title,
+                text: toastData.text,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+        </script>
+        <?php unset($_SESSION['toast_message']); // IMPORTANT: Clear the message immediately! ?>
+    <?php endif; ?>
     <!-- Hero Section -->
     <section class="bg-dark text-light text-center p-5 mb-5">
         <div class="container">
-            <h1 class="display-4 fw-bold">Welcome to Apple Store </h1>
+            <h1 class="display-4 fw-bold">Welcome to E-COMMERCE(APPLE STORE) </h1>
             <p class="lead">Your one-stop hub for all Apple products.</p>
             <a href="category.php?category=iphone" class="btn btn-primary btn-lg">Shop Now</a>
         </div>
@@ -88,7 +110,7 @@ include_once "includes/dbc.inc.php";
         <div class="row g-4">
             <?php
             try {
-                $stmt = $pdo->query("SELECT * FROM product ORDER BY RAND() LIMIT 4");
+                $stmt = $pdo->query("SELECT * FROM product WHERE is_active = 1 ORDER BY RAND() LIMIT 4 ");
                 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 if ($products) {
@@ -144,7 +166,7 @@ include_once "includes/dbc.inc.php";
         </div>
     </section>
     <?php include_once "includes/footer.php"; ?>
-    <script src="product_cart.jsX"></script>
+    <script src="product_cart.js"></script>
 </body>
 
 </html>

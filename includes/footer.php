@@ -6,7 +6,7 @@
     <div class="text-center mb-4">
       <a href="index.php" class="d-inline-flex align-items-center text-decoration-none text-light">
         <img src="pic/favicon.jpg" alt="Logo" style="height: 20px;" class="me-2">
-        <span class="fw-semibold">Apple Store Online</span>
+        <span class="fw-semibold">E-COMMERCE(APPLE STORE)</span>
       </a>
     </div>
 
@@ -20,7 +20,7 @@
             <li><a href="index.php" class="text-light text-decoration-none">Store</a></li>
           <li><a href="category.php?category=mac" class="text-light text-decoration-none">Mac</a></li>
           <li><a href="category.php?category=ipad" class="text-light text-decoration-none">iPad</a></li>
-          <li><a href="categery.php?category=iphone" class="text-light text-decoration-none">iPhone</a></li>
+          <li><a href="category.php?category=iphone" class="text-light text-decoration-none">iPhone</a></li>
           <li><a href="category.php?category=watch" class="text-light text-decoration-none">Watch</a></li>
           <li><a href="category.php?category=others" class="text-light text-decoration-none">TV & Home</a></li>
         </ul>
@@ -66,7 +66,7 @@
 
     <!-- Footer Bottom -->
     <div class="text-center border-top border-secondary pt-3 mt-3 small text-light">
-      <p class="mb-0">© <?= date('Y'); ?> Apple Store. All rights reserved.</p>
+      <p class="mb-0">© <?= date('Y'); ?> E-COMMERCE(APPLE STORE). All rights reserved.</p>
     </div>
 
   </div>

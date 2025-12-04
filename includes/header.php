@@ -8,7 +8,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <a class="navbar-brand d-flex align-items-center" href="index.php">
       <img src="pic/favicon.jpg" alt="Logo" style="height: 33px;" class="me-2">
-      Apple Store
+      E-COMMERCE(APPLE STORE)
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
@@ -33,7 +33,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <li><a class="dropdown-item" href="category.php?category=ipad">iPad</a></li>
             <li><a class="dropdown-item" href="category.php?category=mac">Mac</a></li>
             <li><a class="dropdown-item" href="category.php?category=watch">Watch</a></li>
-            <li><a class="dropdown-item" href="category.php?category=others">TV & Others</a></li>
+            <li><a class="dropdown-item" href="category.php?category=others">Other items</a></li>
           </ul>
         </li>
 
@@ -51,6 +51,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
           <a class="nav-link <?= ($current_page == 'contactus.php') ? 'active' : '' ?>" href="contactus.php">Contact</a>
         </li>
 
+        <li class="nav-item">
+          <form class="d-flex mx-auto" action="search.php" method="GET" role="search">
+          <input class="form-control me-2" type="search" name="q" placeholder="Search products..." aria-label="Search" required>
+          <button class="btn btn-outline-light" type="submit">Search</button>
+          </form>
+        </li>
+
         <?php if (isset($_SESSION['user_id'])): ?>
           <li class="nav-item">
             <a class="nav-link <?= ($current_page == 'logout.php') ? 'active' : '' ?>" href="logout.php">Logout</a>
@@ -65,4 +72,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </div>
   </div>
 </nav>
+<script src="script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
