@@ -7,27 +7,6 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     exit;
 }
 
-// --- DELETE USER LOGIC ---
-if (isset($_GET['delete'])) {
-    $userId = intval($_GET['delete']);
-
-    // 1. Safety Check: Never delete the admin
-    $checkStmt = $pdo->prepare("SELECT uname FROM users WHERE uid = :id");
-    $checkStmt->execute([':id' => $userId]);
-    $targetUser = $checkStmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($targetUser && $targetUser['uname'] === 'admin') {
-        header("Location: manage_user.php?error=" . urlencode("❌ You cannot delete the Super Admin account."));
-        exit;
-    }
-
-    // 2. Proceed with Delete
-    $stmt = $pdo->prepare("DELETE FROM users WHERE uid = :id");
-    $stmt->execute([':id' => $userId]);
-    header("Location: manage_user.php?success=User successfully deleted");
-    exit;
-}
-
 // --- FETCH USERS LOGIC ---
 $search = $_GET['search'] ?? '';
 $searchQuery = htmlspecialchars($search);
@@ -88,9 +67,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Username</th>
                     <th>Email</th>
                     <th>Registered At</th>
-                    <th>
-                        <a href="add_user.php" class="btn btn-sm btn-success">Add User</a>
-                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -103,9 +79,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?= htmlspecialchars($user['uname']) ?></td>
                             <td><?= htmlspecialchars($user['email']) ?></td>
                             <td><?= htmlspecialchars($user['created_at']) ?></td>
-                            <td>
-                                <a href="manage_user.php?delete=<?= $user['uid'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure to delete this user?');">Delete</a>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
