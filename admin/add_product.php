@@ -21,7 +21,7 @@
                 <div class="col-md-7">
                     <div class="card shadow-lg border-0 rounded-3">
                         <div class="card-body p-4">
-                            <h2 class="card-title text-center mb-4"><i class="bi bi-bag"></i>  Add Product</h2>
+                            <h2 class="card-title text-center mb-4"><i class="bi bi-bag"></i> Add Product</h2>
 
                             <form action="handlers/add_product_handler.php" method="post" enctype="multipart/form-data">
 
@@ -31,18 +31,13 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="rating" class="form-label">Rating (0–5):</label>
-                                    <input type="number" id="rating" class="form-control" name="rating" min="0" max="5" step="0.1" placeholder="e.g. 4.5">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="bought" class="form-label">How many bought:</label>
-                                    <input type="number" id="bought" class="form-control" name="bought" min="1" placeholder="e.g. 150">
-                                </div>
-
-                                <div class="mb-3">
                                     <label for="price" class="form-label">Price (₹):</label>
-                                    <input type="text" id="price" class="form-control" name="price" placeholder="Enter product price" required>
+                                    <input type="number" id="price" class="form-control" name="price" placeholder="Enter product price" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Product Description:</label>
+                                    <textarea name="description" class="form-control" rows="5" placeholder="Enter detailed specs, battery life, processor info..."></textarea>
                                 </div>
 
                                 <div class="mb-3">
@@ -55,7 +50,7 @@
 
                                 <div class="mb-3">
                                     <label for="category" class="form-label">Category:</label>
-                                    <select name="cid" id="category" class="form-select" required>
+                                    <select name="category" id="category" class="form-select" required>
                                         <option value="" disabled selected>Select a category</option>
                                         <option value="iphone">iPhone</option>
                                         <option value="ipad">iPad</option>
@@ -66,8 +61,14 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="image" class="form-label">Upload Image:</label>
-                                    <input type="file" id="image" class="form-control" name="image" accept="image/*" required>
+                                    <label class="form-label">Main Product Image (Thumbnail):</label>
+                                    <input type="file" name="image" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Additional Gallery Images (Select Multiple):</label>
+                                    <input type="file" name="gallery[]" class="form-control" multiple accept="image/*">
+                                    <div class="form-text">Hold Ctrl to select multiple files.</div>
                                 </div>
 
                                 <?php
@@ -97,4 +98,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

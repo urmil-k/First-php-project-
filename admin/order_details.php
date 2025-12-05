@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/session_config.php';
 require_once '../includes/dbc.inc.php';
-
+/** @var PDO $pdo */  
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header('Location: ../login.php');
     exit;
@@ -49,8 +49,10 @@ $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="container mt-5">
         <h2>Order Details — Order #<?= htmlspecialchars($orderId) ?></h2>
-        <a href="order_view.php" class="btn btn-secondary mb-4">&larr; Back to Orders</a>
-
+<div class="mb-4">
+    <a href="order_view.php" class="btn btn-secondary">&larr; Back to Orders</a>
+    <a href="../generate_invoice.php?order_id=<?= $orderId ?>" class="btn btn-info text-white">🖨️ Download Invoice</a>
+</div>
         <?php if (isset($_GET['updated'])): ?>
             <div class="alert alert-success">Order status updated successfully!</div>
         <?php endif; ?>
@@ -65,19 +67,21 @@ $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
                 <p><strong>Address:</strong> <?= nl2br(htmlspecialchars($order['address'])) ?></p>
                 <p><strong>Phone:</strong> <?= htmlspecialchars($order['phone']) ?></p>
 
-                <form method="post" action="update_order_status.php" class="mt-3">
+               <form method="post" action="update_order_status.php" class="mt-3">
                     <input type="hidden" name="order_id" value="<?= htmlspecialchars($orderId) ?>">
                     <div class="row g-2 align-items-center">
                         <div class="col-auto">
                             <label for="status" class="col-form-label"><strong>Status:</strong></label>
                         </div>
                         <div class="col-auto">
-                            <?php $status = ucfirst(strtolower(trim($order['status']))); ?>
+                            <?php 
+                            $currentStatus = strtolower(trim($order['status'])); 
+                            ?>
                             <select name="status" id="status" class="form-select">
-                                <option value="Pending" <?= $status === 'Pending'   ? 'selected' : '' ?>>Pending</option>
-                                <option value="Shipped" <?= $status === 'Shipped'   ? 'selected' : '' ?>>Shipped</option>
-                                <option value="Delivered" <?= $status === 'Delivered' ? 'selected' : '' ?>>Delivered</option>
-                                <option value="Cancelled" <?= $status === 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                                <option value="pending"   <?= $currentStatus === 'pending'   ? 'selected' : '' ?>>Pending</option>
+                                <option value="shipped"   <?= $currentStatus === 'shipped'   ? 'selected' : '' ?>>Shipped</option>
+                                <option value="delivered" <?= $currentStatus === 'delivered' ? 'selected' : '' ?>>Delivered</option>
+                                <option value="cancelled" <?= $currentStatus === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
                             </select>
                         </div>
                         <div class="col-auto">

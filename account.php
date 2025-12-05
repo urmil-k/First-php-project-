@@ -13,7 +13,8 @@ $stmt->execute([':id' => $_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
-    die("❌ User not found.");
+    header("Location: login.php");
+    exit;
 }
 
 // Fetch user orders
@@ -95,8 +96,20 @@ foreach ($orders as $row) {
                                 <div class="mb-4 border rounded p-3">
                                     <h6>🧾 Order #<?= $ord['order_id'] ?> | <?= date("d M Y", strtotime($ord['created_at'])) ?></h6>
                                     <p>
-                                        <strong>Status:</strong> <?= htmlspecialchars($ord['status']) ?> |
-                                        <strong>Total:</strong> ₹<?= number_format($ord['total_price'], 2) ?>
+                                        <strong>Status:</strong>
+                                        <?php
+                                        $status = strtolower($ord['status']);
+                                        $badgeClass = match ($status) {
+                                            'pending' => 'bg-warning text-dark',
+                                            'shipped' => 'bg-info text-dark',
+                                            'delivered' => 'bg-success',
+                                            'cancelled' => 'bg-danger',
+                                            default => 'bg-secondary'
+                                        };
+                                        ?>
+                                        <span class="badge rounded-pill <?= $badgeClass ?>">
+                                            <?= ucfirst($status) ?>
+                                        </span> | <strong>Total:</strong> ₹<?= number_format($ord['total_price'], 2) ?>
                                     </p>
                                     <table class="table table-sm table-bordered">
                                         <thead>
@@ -130,8 +143,11 @@ foreach ($orders as $row) {
                                     if ($status != 'cancelled' && $status != 'delivered'): ?>
                                         <div class="text-end">
                                             <button type="button" class="btn btn-danger mt-2" onclick="cancel_order(<?= $ord['order_id'] ?>)">
-                                                 Cancel Order
+                                                Cancel Order
                                             </button>
+                                            <a href="generate_invoice.php?order_id=<?= $ord['order_id'] ?>" target="_blank" class="btn btn-sm btn-secondary mt-2">
+                                                📄 Invoice
+                                            </a>
                                         </div>
                                     <?php else: ?>
                                         <div class="text-end mt-2">

@@ -2,16 +2,80 @@
 require_once 'includes/session_config.php';
 require_once 'includes/dbc.inc.php';
 
+// 1. Check Login & handle redirect with parameters
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php?return=order.php");
+    $redirectUrl = "order.php";
+    if (!empty($_SERVER['QUERY_STRING'])) {
+        $redirectUrl .= "?" . $_SERVER['QUERY_STRING'];
+    }
+    header("Location: login.php?return=" . urlencode($redirectUrl));
     exit;
 }
 
 $userId = $_SESSION['user_id'];
-$cart = $_SESSION['cart'] ?? [];
+$isBuyNow = false;
+$buyNowPid = null;
+
+
+
+if (isset($_GET['action']) && $_GET['action'] === 'buynow' && isset($_GET['pid'])) {
+    // CASE A: User clicked "Order Now" on Product Page
+    $isBuyNow = true;
+    $buyNowPid = intval($_GET['pid']);
+
+    // Fetch the single product directly from DB
+    $stmt = $pdo->prepare("SELECT * FROM product WHERE pid = :pid");
+    $stmt->execute([':pid' => $buyNowPid]);
+    $prod = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($prod) {
+        // Create a temporary cart array just for this page
+        $cart = [
+            $buyNowPid => [
+                'pid' => $prod['pid'],
+                'name' => $prod['pname'],
+                'price' => $prod['price'],
+                'image' => $prod['image'],
+                'quantity' => 1 // Default quantity is 1 for direct buy
+            ]
+        ];
+    } else {
+        die("❌ Product not found.");
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buynow_pid'])) {
+    // CASE B: User is submitting the "Order Now" form
+    $isBuyNow = true;
+    $buyNowPid = intval($_POST['buynow_pid']);
+
+    // Re-fetch product to ensure price security
+    $stmt = $pdo->prepare("SELECT * FROM product WHERE pid = :pid");
+    $stmt->execute([':pid' => $buyNowPid]);
+    $prod = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($prod) {
+        $cart = [
+            $buyNowPid => [
+                'pid' => $prod['pid'],
+                'name' => $prod['pname'],
+                'price' => $prod['price'],
+                'image' => $prod['image'],
+                'quantity' => 1
+            ]
+        ];
+    } else {
+        die("❌ Invalid product in order.");
+    }
+} else {
+    // CASE C: Standard Cart Checkout
+    $cart = $_SESSION['cart'] ?? [];
+}
+
+// --------------------------------------------------------
 
 if (empty($cart)) {
-    die("<div class='alert alert-warning text-center mt-5'>Your cart is empty. Please add products before placing an order.</div>");
+    // Redirect empty cart to home
+    header("Location: index.php?error=empty_cart");
+    exit;
 }
 
 $errors = [];
@@ -48,17 +112,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $orderId = $pdo->lastInsertId();
             $stmtItem = $pdo->prepare("INSERT INTO order_items (order_id, pid, quantity, price) VALUES (:order_id, :product_id, :quantity, :price)");
 
-            foreach ($cart as $item) {
-                $stmtItem->execute([
-                    ':order_id' => $orderId,
-                    ':product_id' => $item['pid'],
-                    ':quantity' => $item['quantity'],
-                    ':price' => $item['price']
-                ]);
-            }
+            // Prepare the statement to update the 'how_many_bought' counter
+$updateProductStmt = $pdo->prepare("UPDATE product SET how_many_bought = how_many_bought + :qty WHERE pid = :pid");
+
+foreach ($cart as $item) {
+    // 1. Insert into Order Items
+    $stmtItem->execute([
+        ':order_id' => $orderId,
+        ':product_id' => $item['pid'],
+        ':quantity' => $item['quantity'],
+        ':price' => $item['price']
+    ]);
+
+    // 2. INCREMENT the 'how_many_bought' count for this product
+    $updateProductStmt->execute([
+        ':qty' => $item['quantity'],
+        ':pid' => $item['pid']
+    ]);
+}
 
             $pdo->commit();
-            unset($_SESSION['cart']);
+            
+            // Only clear the session cart if this was a normal checkout!
+            // If it was "Buy Now", we leave the user's cart alone.
+            if (!$isBuyNow) {
+                unset($_SESSION['cart']);
+            }
+            
             $success = "✅ Order placed successfully! Your order ID is #$orderId.";
         } catch (Exception $e) {
             $pdo->rollBack();
@@ -76,57 +156,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Place Order</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .order-card {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .note {
-            color: red;
-            font-weight: bold;
-        }
-
-        h2 {
-            color: #343a40;
-            margin-bottom: 1.5rem;
-        }
-
-        .btn-group-custom a,
-        .btn-group-custom button {
-            min-width: 150px;
-        }
-
-        .cart-table {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .cart-table thead {
-            background: #343a40;
-            color: #fff;
-        }
-
-        .cart-table tbody tr:hover {
-            background-color: #f1f1f1;
-            transition: background 0.2s ease-in-out;
-        }
-
-        .cart-table tfoot th {
-            background: #409970ff;
-            color: #fff;
-            font-size: 1.1rem;
-        }
-
-        .subtotal {
-            font-weight: 600;
-            color: #0d6efd;
-        }
+        body { background-color: #f8f9fa; }
+        .order-card { background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .note { color: red; font-weight: bold; }
+        .cart-table thead { background: #343a40; color: #fff; }
+        .cart-table tfoot th { background: #409970ff; color: #fff; font-size: 1.1rem; }
     </style>
 </head>
 
@@ -138,15 +172,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h2 class="text-center">🛒 Place Your Order</h2>
 
             <?php if ($success): ?>
-                <div class="alert alert-success text-center"><?= htmlspecialchars($success) ?></div>
-                <div class="text-center mt-3">
-                    <a href="index.php" class="btn btn-primary btn-lg">🏠 Back to Home</a>
+                <div class="alert alert-success text-center">
+                    <h4><?= htmlspecialchars($success) ?></h4>
+                    <p class="mt-3">
+                        <a href="generate_invoice.php?order_id=<?= $orderId ?>" class="btn btn-dark">📄 Download Invoice</a>
+                        <a href="index.php" class="btn btn-primary">🏠 Back to Home</a>
+                    </p>
                 </div>
             <?php else: ?>
 
                 <?php if ($errors): ?>
                     <div class="alert alert-danger">
-                        <ul>
+                        <ul class="mb-0">
                             <?php foreach ($errors as $err): ?>
                                 <li><?= htmlspecialchars($err) ?></li>
                             <?php endforeach; ?>
@@ -154,7 +191,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 <?php endif; ?>
 
-                <h4 class="mb-3">Your Cart Summary</h4>
+                <h4 class="mb-3">
+                    <?= $isBuyNow ? "⚡ Instant Checkout Item" : "Your Cart Summary" ?>
+                </h4>
+                
                 <div class="table-responsive mb-4">
                     <table class="table table-bordered table-hover cart-table">
                         <thead>
@@ -189,8 +229,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </table>
                 </div>
 
-
                 <form method="post" action="order.php">
+                    <?php if ($isBuyNow): ?>
+                        <input type="hidden" name="buynow_pid" value="<?= htmlspecialchars($buyNowPid) ?>">
+                    <?php endif; ?>
+
                     <div class="mb-3">
                         <label for="name" class="form-label">Full Name *</label>
                         <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
@@ -208,20 +251,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone Number *</label>
-                        <input type="tel" class="form-control" id="phone" name="phone" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" required>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" required pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number">
                     </div>
 
                     <p class="note">⚠️ NOTE: Payment is accepted only as Cash on Delivery</p>
 
-                    <div class="d-flex justify-content-between flex-wrap btn-group-custom gap-2 mt-3">
-                        <button type="submit" class="btn btn-success">✅ Place Order</button>
-                        <a href="cart.php" class="btn btn-secondary">🛒 Back to Cart</a>
-                        <a href="index.php" class="btn btn-secondary">🏠 Home</a>
+                    <div class="d-flex justify-content-between flex-wrap gap-2 mt-3">
+                        <button type="submit" class="btn btn-success btn-lg">✅ Confirm Order</button>
+                        
+                        <?php if($isBuyNow): ?>
+                             <a href="product.php?pid=<?= $buyNowPid ?>" class="btn btn-secondary">↩ Cancel</a>
+                        <?php else: ?>
+                             <a href="cart.php" class="btn btn-secondary">🛒 Back to Cart</a>
+                        <?php endif; ?>
                     </div>
                 </form>
             <?php endif; ?>
         </div>
     </div>
 </body>
-
 </html>

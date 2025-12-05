@@ -7,22 +7,17 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     exit;
 }
 
-if (isset($_GET['delete'])) {
-    $userId = intval($_GET['delete']);
-    $stmt = $pdo->prepare("DELETE FROM users WHERE uid = :id");
-    $stmt->execute([':id' => $userId]);
-    header("Location: manage_user.php?success=User successfully deleted");
-    exit;
-}
-
+// --- FETCH USERS LOGIC ---
 $search = $_GET['search'] ?? '';
 $searchQuery = htmlspecialchars($search);
 
 if ($search) {
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE uname LIKE :search OR email LIKE :search");
+    // Search but EXCLUDE admin
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE (uname LIKE :search OR email LIKE :search) AND uname != 'admin'");
     $stmt->execute([':search' => "%$search%"]);
 } else {
-    $stmt = $pdo->query("SELECT * FROM users ORDER BY uid DESC");
+    // Show all users EXCEPT admin
+    $stmt = $pdo->query("SELECT * FROM users WHERE uname != 'admin' ORDER BY uid DESC");
 }
 
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -43,6 +38,10 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success"><?= htmlspecialchars($_GET['success']) ?></div>
+        <?php endif; ?>
+        
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($_GET['error']) ?></div>
         <?php endif; ?>
 
         <form class="row g-3 mb-4" method="GET">
@@ -68,9 +67,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Username</th>
                     <th>Email</th>
                     <th>Registered At</th>
-                    <th>
-                        <a href="add_user.php" class="btn btn-sm btn-success">Add User</a>
-                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -83,9 +79,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?= htmlspecialchars($user['uname']) ?></td>
                             <td><?= htmlspecialchars($user['email']) ?></td>
                             <td><?= htmlspecialchars($user['created_at']) ?></td>
-                            <td>
-                                <a href="manage_user.php?delete=<?= $user['uid'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure to delete this user?');">Delete</a>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>

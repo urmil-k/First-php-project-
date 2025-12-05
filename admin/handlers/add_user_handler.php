@@ -48,6 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 } else {
-    header('location: ../add_user.php?success="user not added"');
+    header('location: ../add_user.php?error=user_not_added');
     exit;
 }

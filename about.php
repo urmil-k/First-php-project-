@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Apple Store Online</title>
+    <title>About - E-COMMERCE(APPLE STORE)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -16,7 +16,7 @@
     <!-- Hero Section -->
     <section class="py-5 bg-dark text-white text-center">
         <div class="container">
-            <h1 class="fw-bold">About Apple Store Online</h1>
+            <h1 class="fw-bold">About E-COMMERCE(APPLE STORE)</h1>
             <p class="lead">Holiday Gifts • Apple (IN)</p>
         </div>
     </section>
@@ -30,13 +30,13 @@
                     <div class="card shadow-sm border-0 p-4">
                         <div class="card-body">
                             <h4 class="fw-bold mb-3">Apple Intelligence</h4>
-                            <p>∆ Apple Intelligence is available in beta on all iPhone 16 models, iPhone 15 Pro, iPhone 15 Pro Max, iPad
+                            <p>Apple Intelligence is available in beta on all iPhone 16 models, iPhone 15 Pro, iPhone 15 Pro Max, iPad
                                 mini (A17 Pro), and iPad and Mac models with M1 and later, with Siri and device language set to English
                                 (Australia, Canada, Ireland, New Zealand, South Africa, UK or US), as part of an iOS 18, iPadOS 18 and
                                 macOS Sequoia software update...</p>
 
                             <h4 class="fw-bold mt-4 mb-3">Monthly Pricing & EMI</h4>
-                            <p>◊◊ Monthly pricing is after purchase using EMI with qualifying cards at 15.99% p.a. over a 12-month
+                            <p>Monthly pricing is after purchase using EMI with qualifying cards at 15.99% p.a. over a 12-month
                                 tenure. Monthly pricing is rounded to the nearest rupee...</p>
 
                             <h4 class="fw-bold mt-4 mb-3">Representative Example</h4>
@@ -44,7 +44,7 @@
                                 payments of ₹7,249.00 at an interest rate of 15.99% p.a. Total interest paid: ₹7,088.00.</p>
 
                             <h4 class="fw-bold mt-4 mb-3">No Cost EMI</h4>
-                            <p>§ No Cost EMI is available with the purchase of an eligible product made using qualifying cards...</p>
+                            <p>No Cost EMI is available with the purchase of an eligible product made using qualifying cards...</p>
 
                             <h4 class="fw-bold mt-4 mb-3">Trade-in</h4>
                             <p>Mac, iPad, and Apple Watch trade-in is available only in-store in India. Apple Retail Online in India

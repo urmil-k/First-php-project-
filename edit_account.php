@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Refresh user info
         $stmt->execute([':id' => $_SESSION['user_id']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $_SESSION['username'] = $username;
     }
 }
 ?>
@@ -87,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control"
+                                <input type="email" name="email" id="email" class="form-control"
                                        value="<?= htmlspecialchars($user['email']) ?>" required>
                             </div>
 

@@ -2,6 +2,8 @@
 require_once '../includes/dbc.inc.php';
 require_once '../includes/session_config.php';
 
+/** @var PDO $pdo */
+
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header('Location: ../login.php');
     exit;
@@ -10,33 +12,25 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 if (isset($_GET['delete'])) {
     $productId = intval($_GET['delete']);
 
-    $stmt = $pdo->prepare("SELECT image FROM product WHERE pid = :id");
-    $stmt->execute([':id' => $productId]);
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($product && !empty($product['image'])) {
-        $imagePath = __DIR__ . '/' . $product['image'];
-        if (file_exists($imagePath)) {
-            unlink($imagePath);
-        }
-    }
-
-    $stmt = $pdo->prepare("DELETE FROM product WHERE pid = :id");
+    // Instead of deleting the row, we just mark it as inactive.
+    // We KEEP the image files so past orders still look correct.
+    $stmt = $pdo->prepare("UPDATE product SET is_active = 0 WHERE pid = :id");
     $stmt->execute([':id' => $productId]);
 
-    header("Location: product_list.php?success=Product successfully deleted");
+    header("Location: product_list.php?success=Product deactivated successfully");
     exit;
 }
 
-
+// --- FETCH PRODUCTS LOGIC ---
 $search = $_GET['category'] ?? '';
 $searchQuery = htmlspecialchars($search);
 
+// Only fetch ACTIVE products for the main list
 if ($search) {
-    $stmt = $pdo->prepare("SELECT * FROM product WHERE category = :cid ORDER BY pid DESC");
+    $stmt = $pdo->prepare("SELECT * FROM product WHERE category = :cid AND is_active = 1 ORDER BY pid DESC");
     $stmt->execute([':cid' => $search]);
 } else {
-    $stmt = $pdo->query("SELECT * FROM product ORDER BY pid DESC");
+    $stmt = $pdo->query("SELECT * FROM product WHERE is_active = 1 ORDER BY pid DESC");
 }
 
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -93,7 +87,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Price</th>
                     <th>Rating</th>
                     <th>Category</th>
-                    <th>EMI Available</th>
                     <th>Image</th>
                     <th>Actions</th>
                 </tr>
@@ -103,11 +96,15 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($products as $product): ?>
                         <tr>
                             <td><?= htmlspecialchars($product['pid']) ?></td>
-                            <td><?= htmlspecialchars($product['pname']) ?></td>
+                            <td>
+                                <?= htmlspecialchars($product['pname']) ?>
+                                <?php if(empty($product['is_active'])): ?>
+                                    <span class="badge bg-danger">Inactive</span>
+                                <?php endif; ?>
+                            </td>
                             <td>₹<?= number_format($product['price'], 2) ?></td>
                             <td><?= htmlspecialchars($product['rating']) ?></td>
                             <td><?= htmlspecialchars($product['category']) ?></td>
-                            <td><?= htmlspecialchars($product['EMI_avail']) ?></td>
                             <td>
                                 <?php if ($product['image'] && file_exists(__DIR__ . '/' . $product['image'])): ?>
                                     <img src="<?= htmlspecialchars($product['image']) ?>" alt="Product Image" style="height: 50px;">
@@ -117,13 +114,18 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </td>
                             <td>
                                 <a href="edit_product.php?pid=<?= $product['pid'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                                <a href="product_list.php?delete=<?= $product['pid'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                                
+                                <a href="product_list.php?delete=<?= $product['pid'] ?>" 
+                                   class="btn btn-sm btn-danger" 
+                                   onclick="return confirm('Are you sure? This will remove the product from the shop but keep it in order history.');">
+                                   Delete
+                                </a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="8" class="text-center text-muted">No products found.</td>
+                        <td colspan="8" class="text-center text-muted">No active products found.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
@@ -133,5 +135,4 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 </body>
-
 </html>
